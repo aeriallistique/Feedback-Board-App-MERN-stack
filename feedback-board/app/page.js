@@ -3,6 +3,7 @@ import { useState } from "react";
 import FeedbackFormPopup from "./components/FeedbackFormPopup";
 import FeedbackItem from "./components/FeedbackItem";
 import Button from "./components/Button";
+import FeedbackItemPopup from "./components/FeedbackItemPopup";
 
 export default function Home() {
   const [showFeebackPopupForm, setShowFeedbackPopupForm] = useState(false)
@@ -59,9 +60,9 @@ export default function Home() {
         <FeedbackFormPopup setShow={setShowFeedbackPopupForm}/>
       )}
       {showFeebackPopupItem && (
-        <div>
-          opened feedback: {showFeebackPopupItem.title}
-        </div>
+        <FeedbackItemPopup 
+          {...showFeebackPopupItem} 
+          setShow={setShowFeedbackPopupItem} />
       )}
 
     </main>
