@@ -11,7 +11,7 @@ export default function FeedbackItemPopupComments(){
     <div className="flex gap-4 mb-8">
       <Avatar />
       <div>
-      <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+      <p className="text-gray-600">Lorem ipsum dolor, sit amet consectetur adipisicing elit.
          Perferendis eligendi reiciendis, impedit velit facere omnis!
          Quasi possimus reprehenderit neque, sint obcaecati ipsum magni
          modi impedit quae odio corrupti accusantium veniam? 
