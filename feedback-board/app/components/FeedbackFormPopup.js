@@ -2,6 +2,8 @@ import Popup from "./Popup"
 import Button from "./Button"
 import { useState } from "react";
 import axios from 'axios';
+import PaperClip from "./icons/PaperClip";
+import Trash from "./icons/Trash";
 
 export default function FeedbackFormPopup({setShow}){
   const [title, setTitle] = useState('');
@@ -32,6 +34,13 @@ export default function FeedbackFormPopup({setShow}){
     });
   }
 
+  function handleReomveFileButtonClick(ev,link){
+    ev.preventDefault();
+    setUploads(currentUpload =>{
+      return[currentUpload.filter(val => val !== link)]
+    })
+  }
+
   return(
     <Popup setShow={setShow} title="Make a suggestion" >
       <form action="" className="p-8">
@@ -57,15 +66,24 @@ export default function FeedbackFormPopup({setShow}){
                 <label
                   className="block mt-2 mb-1 text-slate-700"
                   htmlFor="">Files</label>
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                  {uploads.map(link => (
-                   <div className="h-16">
-                     {link?.endsWith('jpg') ? (
-                       <img className="h-16 w-auto rounded-md" src={link} alt=""  />
+                   <a href={link} target="_blank" className="h-16 relative">
+                     <button
+                       onClick={(ev)=> handleReomveFileButtonClick(ev,link) } 
+                       className="-right-2 -top-2 absolute bg-red-300 
+                        p-1 rounded-md text-white">
+                       <Trash />
+                     </button>
+                     {/.(jpg|png|jpeg)$/.test(link) ? (
+                       <img className="h-16 w-auto rounded-md" src={link} alt={link}  />
                      ) : (
-                       <div>{link}</div>
+                       <div className="bg-gray-200 h-16 p-2 flex items-center rounded-md">
+                         <PaperClip className="w-4 h-4"/>
+                         {String(link).split('/')[3].substring(30)}
+                       </div>
                      )}
-                   </div>
+                   </a>
                  ))}
                </div>
               </div>
