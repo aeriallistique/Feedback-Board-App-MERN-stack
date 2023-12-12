@@ -9,6 +9,7 @@ export default function FeedbackFormPopup({setShow}){
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [uploads, setUploads] = useState([])
+
   function handleCreatePostButtonClick(ev){
     ev.preventDefault();
 
@@ -37,9 +38,11 @@ export default function FeedbackFormPopup({setShow}){
   function handleReomveFileButtonClick(ev,link){
     ev.preventDefault();
     setUploads(currentUpload =>{
-      return[currentUpload.filter(val => val !== link)]
+      return [currentUpload.filter(val => val !== link)]
     })
+    console.log(uploads)
   }
+
 
   return(
     <Popup setShow={setShow} title="Make a suggestion" >
@@ -67,7 +70,7 @@ export default function FeedbackFormPopup({setShow}){
                   className="block mt-2 mb-1 text-slate-700"
                   htmlFor="">Files</label>
                 <div className="flex gap-3">
-                 {uploads.map(link => (
+                 { uploads.map(link => (
                    <a href={link} target="_blank" className="h-16 relative">
                      <button
                        onClick={(ev)=> handleReomveFileButtonClick(ev,link) } 
@@ -75,16 +78,18 @@ export default function FeedbackFormPopup({setShow}){
                         p-1 rounded-md text-white">
                        <Trash />
                      </button>
-                     {/.(jpg|png|jpeg)$/.test(link) ? (
+                     {uploads.length > 0 && /.(jpg|png|jpeg)$/.test(link) ? (
                        <img className="h-16 w-auto rounded-md" src={link} alt={link}  />
                      ) : (
                        <div className="bg-gray-200 h-16 p-2 flex items-center rounded-md">
-                         <PaperClip className="w-4 h-4"/>
-                         {String(link).split('/')[3].substring(30)}
-                       </div>
+                       <PaperClip className="w-4 h-4"/>
+                       meh
+                     </div>
                      )}
                    </a>
                  ))}
+                 
+                 
                </div>
               </div>
                
