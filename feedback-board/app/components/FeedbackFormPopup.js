@@ -4,16 +4,19 @@ import { useState } from "react";
 import axios from 'axios';
 import PaperClip from "./icons/PaperClip";
 import Trash from "./icons/Trash";
+import {MoonLoader} from 'react-spinners';
+
 
 export default function FeedbackFormPopup({setShow}){
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [uploads, setUploads] = useState([])
   const [isUploading, setIsUploading] = useState(false);
+
   function handleCreatePostButtonClick(ev){
     ev.preventDefault();
 
-    axios.post('/api/feedback', {title, description})
+    axios.post('/api/feedback', {title, description, uploads})
     .then(()=> {
       setShow(false);
 
@@ -31,7 +34,7 @@ export default function FeedbackFormPopup({setShow}){
     const res = await axios.post('/api/upload', data);
 
     setUploads((existingUploads)=> {
-      const responseArray = res.data[0];
+      const responseArray = res.data;
       return existingUploads.concat(responseArray);
     });
     setIsUploading(false)
@@ -103,8 +106,12 @@ export default function FeedbackFormPopup({setShow}){
            
 
             <div className="flex gap-2 mt-2 justify-end">
-              <label className={(isUploading ? 'text-gray-400': 'text-gray-600')+" py-2 px-4  cursor-pointer"}>
-                <span>{isUploading ? 'uploading...' : 'Attach Files'}</span>
+              <label className={" flex gap-2 py-2 px-4  cursor-pointer"} >
+                {isUploading && (
+                  <MoonLoader size={18}/>
+                )}
+                <span className={(isUploading ? 'text-gray-400': 'text-gray-600')}>
+                  {isUploading ? 'uploading...' : 'Attach Files'}</span>
                 <input
                   onChange={handleAttachFilesInputChange} 
                   type="file" 

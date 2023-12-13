@@ -1,14 +1,22 @@
 'use client';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FeedbackFormPopup from "./components/FeedbackFormPopup";
 import FeedbackItem from "./components/FeedbackItem";
 import Button from "./components/Button";
 import FeedbackItemPopup from "./components/FeedbackItemPopup";
+import axios from "axios";
 
 export default function Home() {
   const [showFeebackPopupForm, setShowFeedbackPopupForm] = useState(false)
   const [showFeebackPopupItem, setShowFeedbackPopupItem] = useState(null)
-  
+  const [feedbacks, setFeedbacks] = useState([])
+
+  useEffect(()=>{
+    axios.get('/api/feedback').then(res => {
+      setFeedbacks(res.data)
+    })
+  },[])
+
   function openFeedbackPopUpForm(){
     setShowFeedbackPopupForm(true)
   }
@@ -17,16 +25,7 @@ export default function Home() {
     setShowFeedbackPopupItem(feedback)
   }
 
-  const feedbacks = [
-    { title:'Please post more videos', 
-      description:'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quod impedit sequi officiis consequuntur repudiandae facilis recusandae architecto voluptates laborum explicabo?', 
-      votesCount: 80
-    },
-    { title:'Please post more stories', 
-      description:'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quod impedit sequi officiis consequuntur repudiandae facilis recusandae architecto voluptates laborum explicabo?', 
-      votesCount: 40
-    }
-  ]
+ 
 
   return (
     <main className="bg-white max-w-2xl md:mx-auto 
