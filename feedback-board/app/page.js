@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import FeedbackFormPopup from "./components/FeedbackFormPopup";
 import FeedbackItem from "./components/FeedbackItem";
 import Button from "./components/Button";
