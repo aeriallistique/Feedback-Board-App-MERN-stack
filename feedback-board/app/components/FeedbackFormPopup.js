@@ -9,7 +9,7 @@ export default function FeedbackFormPopup({setShow}){
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [uploads, setUploads] = useState([])
-
+  const [isUploading, setIsUploading] = useState(false);
   function handleCreatePostButtonClick(ev){
     ev.preventDefault();
 
@@ -22,25 +22,28 @@ export default function FeedbackFormPopup({setShow}){
 
   async function handleAttachFilesInputChange(ev){
     const files = [...ev.target.files];
+    setIsUploading(true)
     const data = new FormData();
     
-    
-
     for(const file of files){
       data.append('file', file)
     }
     const res = await axios.post('/api/upload', data);
+
     setUploads((existingUploads)=> {
-      return [...existingUploads, res.data];
+      const responseArray = res.data[0];
+      return existingUploads.concat(responseArray);
     });
+    setIsUploading(false)
   }
 
   function handleReomveFileButtonClick(ev,link){
     ev.preventDefault();
     setUploads(currentUpload =>{
-      return [currentUpload.filter(val => val !== link)]
+      const newArr = currentUpload.filter(val=> val !== link);
+      return newArr;
     })
-    console.log(uploads)
+    
   }
 
 
@@ -70,6 +73,7 @@ export default function FeedbackFormPopup({setShow}){
                   className="block mt-2 mb-1 text-slate-700"
                   htmlFor="">Files</label>
                 <div className="flex gap-3">
+
                  { uploads.map(link => (
                    <a href={link} target="_blank" className="h-16 relative">
                      <button
@@ -78,18 +82,20 @@ export default function FeedbackFormPopup({setShow}){
                         p-1 rounded-md text-white">
                        <Trash />
                      </button>
-                     {uploads.length > 0 && /.(jpg|png|jpeg)$/.test(link) ? (
+                     {uploads.length > 0 && /.(jpg|png|jpeg)$/.test(link) && (
                        <img className="h-16 w-auto rounded-md" src={link} alt={link}  />
-                     ) : (
-                       <div className="bg-gray-200 h-16 p-2 flex items-center rounded-md">
+                     ) }
+                     {!(/.(jpg|png|jpeg)$/.test(link)) && uploads.length > 0 &&(
+                       <div className="bg-gray-200 h-16 p-6 flex items-center rounded-md text-xs">
                        <PaperClip className="w-4 h-4"/>
-                       meh
+                       Invalid<br /> Format
                      </div>
+                     )}
+                     {uploads.length === 0 && (
+                       <div className="p-2">nout</div>
                      )}
                    </a>
                  ))}
-                 
-                 
                </div>
               </div>
                
@@ -97,8 +103,8 @@ export default function FeedbackFormPopup({setShow}){
            
 
             <div className="flex gap-2 mt-2 justify-end">
-              <label className="py-2 px-4 text-gray-600 cursor-pointer">
-                <span>Attach Files</span>
+              <label className={(isUploading ? 'text-gray-400': 'text-gray-600')+" py-2 px-4  cursor-pointer"}>
+                <span>{isUploading ? 'uploading...' : 'Attach Files'}</span>
                 <input
                   onChange={handleAttachFilesInputChange} 
                   type="file" 
