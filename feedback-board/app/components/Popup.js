@@ -1,8 +1,9 @@
 
 
-export default function Popup({setShow, children, title}){
+export default function Popup({setShow, children, title, narrow}){
 
   function close(ev){
+    ev.preventDefault();
     ev.stopPropagation();
     setShow(false);
   }
@@ -18,7 +19,7 @@ export default function Popup({setShow, children, title}){
         </svg>
       </button>
       <div className="w-full">
-      <div className="bg-white md:max-w-2xl md:mx-auto md:rounded-lg overflow-hidden" 
+      <div className={(narrow ? 'md:max-w-sm' : 'md:max-w-2xl')+" bg-white  md:mx-auto md:rounded-lg overflow-hidden"} 
         onClick={(ev)=> ev.stopPropagation()}>
         <div className="relative min-h-[40px] md:min-h-0">
           <button
