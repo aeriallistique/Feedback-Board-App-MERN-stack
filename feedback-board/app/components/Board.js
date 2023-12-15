@@ -10,7 +10,8 @@ export default function Board(){
   const [showFeebackPopupForm, setShowFeedbackPopupForm] = useState(false)
   const [showFeebackPopupItem, setShowFeedbackPopupItem] = useState(null)
   const [feedbacks, setFeedbacks] = useState([])
-  
+  const [votes, setVotes] = useState([])
+  const [votesLoadin, setVotesLoading] = useState(false);
   const {data:session} = useSession();
 
   useEffect(()=>{
@@ -19,17 +20,31 @@ export default function Board(){
     })
   },[])
 
+
+  useEffect(()=>{
+    fetchVotes();
+  },[feedbacks])
+
   useEffect(()=>{
     if(session?.user?.email){
       const feedbackID = localStorage.getItem('vote_after_login');
       if(feedbackID){
-        alert(feedbackID)
+        
         // axio to api to save the vote
         axios.post('/api/vote', {feedbackID})
         // remove id from local storage
+        localStorage.removeItem('vote_after_login');
       }
     }
   },[session?.user?.email])
+
+  async function fetchVotes(){
+    setVotesLoading(true);
+    const ids = feedbacks.map(f=> f._id);
+    const res = await axios.get('/api/vote?feedbackIds='+ids.join(','));
+    setVotes(res.data);
+    setVotesLoading(false);
+  }
 
   function openFeedbackPopUpForm(){
     setShowFeedbackPopupForm(true)
@@ -64,12 +79,15 @@ export default function Board(){
         </div>
         <div className="px-8 ">
           {feedbacks.map(feedback => (
-            <FeedbackItem {...feedback} 
+            <FeedbackItem {...feedback}
+                          onVotesChange={fetchVotes}
+                          votes={votes.filter(v=> v.feedbackID.toString() === feedback._id.toString())}
+                          parentLoadingVotes={votesLoadin} 
                           onOpen={()=> openFeedbackPopupItem(feedback)}/> 
           ))}
           
           
-        </div>
+        </div> 
         {showFeebackPopupForm && (
           <FeedbackFormPopup setShow={setShowFeedbackPopupForm}/>
         )}

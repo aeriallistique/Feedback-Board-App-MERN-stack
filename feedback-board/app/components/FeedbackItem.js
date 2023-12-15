@@ -1,12 +1,16 @@
 import { useState } from "react";
 import Button from "./Button";
 import Popup from "./Popup";
-import {signIn} from "next-auth/react"
+import {signIn, useSession} from "next-auth/react"
+import axios from "axios";
+import { MoonLoader } from "react-spinners";
 
 
-export default function FeedbackItem({onOpen, _id, title, description, votesCount}){
+export default function FeedbackItem({onOpen, _id, title, description, votes, onVotesChange, parentLoadingVotes=true}){
   const [showLoginPopup, setShowLoginPopup] = useState(false);
-  const isLoggedIn = false;
+  const [isVoteLoading, setIsVoteLoading] = useState(false);
+  const { data: session} = useSession();
+  const isLoggedIn = !!session?.user?.email;
 
   function handleVoteButtonClick(ev){
     ev.stopPropagation();
@@ -15,8 +19,15 @@ export default function FeedbackItem({onOpen, _id, title, description, votesCoun
     if(!isLoggedIn){
       localStorage.setItem('vote_after_login', _id);
       setShowLoginPopup(true);
+    }else{
+      setIsVoteLoading(true);
+      axios.post('/api/vote', {feedbackID:_id}).then(async ()=>{
+        await onVotesChange();
+        setIsVoteLoading(false);
+
+      })
     }
-  }
+  } 
 
   
 
@@ -45,13 +56,24 @@ export default function FeedbackItem({onOpen, _id, title, description, votesCoun
                 
               </Popup>
             )}
-            <button
-            onClick={handleVoteButtonClick} 
-              className="shadow-md shadow-gray-200 border 
-              rounded-md py-1 px-4 flex items-center gap-1 text-gray-600">
-              <span className="triangle-vote-up "></span>
-              {votesCount || '0'}
-            </button>
+
+            {!parentLoadingVotes && (
+              <button
+              onClick={handleVoteButtonClick} 
+                className="shadow-md shadow-gray-200 border 
+                rounded-md py-1 px-4 flex items-center gap-1 text-gray-600">
+                  {!isVoteLoading && (
+                    <>
+                      <span className="triangle-vote-up "></span>
+                      {votes?.length || '0'}
+                    </>
+                  )}
+                {isVoteLoading && (
+                  <MoonLoader size={20} />
+                )}
+              </button>
+            )}
+            
           </div>
           
         </a>

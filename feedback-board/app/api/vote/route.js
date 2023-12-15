@@ -11,7 +11,26 @@ export async function POST(request){
   const session = await getServerSession(authOptions);
   const {email: userEmail} = session.user; 
 
-  const voteDocument = await Vote.create({feedbackID, userEmail});
+  // find existing vote
+  const existingVote = await Vote.findOne({feedbackID, userEmail})
+  if(existingVote){
+    // if there's a vote, then remove it
+    await Vote.findByIdAndDelete(existingVote._id);
+    return Response.json(existingVote);
+  }else{
+    const voteDocument = await Vote.create({feedbackID, userEmail});
+    return Response.json(voteDocument)
+  }
+}
 
-  return Response.json(voteDocument)
+
+export async function GET(request){
+  const url = new URL(request.url);
+  if(url.searchParams.get('feedbackIds')){
+    const feedbackIds = url.searchParams.get('feedbackIds').split(',');
+    const votesDocs = await Vote.find({feedbackID: feedbackIds});
+    return Response.json(votesDocs);
+  }
+  
+  return Response.json([])
 }

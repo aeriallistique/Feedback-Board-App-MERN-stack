@@ -1,6 +1,7 @@
 import Button from "./Button";
 import Popup from "./Popup";
 import FeedbackItemPopupComments from "./FeedbackItemPopupComments";
+
 export default function FeedbackItemPopup({title,description, setShow, children, votesCount }){
   return(
     <Popup title={''} setShow={setShow}> 
