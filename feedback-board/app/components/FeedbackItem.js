@@ -24,18 +24,17 @@ export default function FeedbackItem({onOpen, _id, title, description, votes, on
       axios.post('/api/vote', {feedbackID:_id}).then(async ()=>{
         await onVotesChange();
         setIsVoteLoading(false);
-
       })
     }
   } 
-
-  
 
   async function handleGoogleLoginButtonClick(ev){
     ev.stopPropagation();
     ev.preventDefault();
     await signIn('google')
   }
+
+  const iVoted = !!votes.find(v=> v.userEmail === session?.user?.email)
 
   return(
     <a href=""
@@ -56,12 +55,11 @@ export default function FeedbackItem({onOpen, _id, title, description, votes, on
                 
               </Popup>
             )}
-
-            {!parentLoadingVotes && (
-              <button
-              onClick={handleVoteButtonClick} 
-                className="shadow-md shadow-gray-200 border 
-                rounded-md py-1 px-4 flex items-center gap-1 text-gray-600">
+              <Button
+                primary={iVoted}
+                onClick={handleVoteButtonClick} 
+                className={'shadow-sm border '}
+              >
                   {!isVoteLoading && (
                     <>
                       <span className="triangle-vote-up "></span>
@@ -71,8 +69,7 @@ export default function FeedbackItem({onOpen, _id, title, description, votes, on
                 {isVoteLoading && (
                   <MoonLoader size={20} />
                 )}
-              </button>
-            )}
+              </Button>
             
           </div>
           

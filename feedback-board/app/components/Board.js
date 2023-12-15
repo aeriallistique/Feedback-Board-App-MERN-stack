@@ -31,9 +31,11 @@ export default function Board(){
       if(feedbackID){
         
         // axio to api to save the vote
-        axios.post('/api/vote', {feedbackID})
-        // remove id from local storage
-        localStorage.removeItem('vote_after_login');
+        axios.post('/api/vote', {feedbackID}).then(()=>{
+          // remove id from local storage
+          localStorage.removeItem('vote_after_login');
+          fetchVotes();
+        }) 
       }
     }
   },[session?.user?.email])
@@ -93,7 +95,9 @@ export default function Board(){
         )}
         {showFeebackPopupItem && (
           <FeedbackItemPopup 
-            {...showFeebackPopupItem} 
+            {...showFeebackPopupItem}
+            votes={votes.filter(v=> v.feedbackID.toString()=== showFeebackPopupItem._id)} 
+            onVotesChange={fetchVotes}
             setShow={setShowFeedbackPopupItem} />
         )}
 
