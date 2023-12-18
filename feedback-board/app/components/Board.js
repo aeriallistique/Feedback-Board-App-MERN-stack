@@ -64,7 +64,7 @@ export default function Board(){
   return(
     <main className="bg-white max-w-2xl md:mx-auto 
           md:shadow-lg md:rounded-lg md:mt-8 overflow-hidden">
-            {session?.user?.email || 'not logged in'}
+            
         <div className="bg-gradient-to-r from-cyan-400 to-blue-400 p-8">
           <h1 className="font-bold text-xl">
             Coding with Andrei
@@ -96,7 +96,7 @@ export default function Board(){
         </div> 
         {showFeebackPopupForm && (
           <FeedbackFormPopup 
-            onCreate={fetchFeedbacks}
+            onCreate={fetchFeedbacks}  
             setShow={setShowFeedbackPopupForm}/>
         )}
         {showFeebackPopupItem && (
