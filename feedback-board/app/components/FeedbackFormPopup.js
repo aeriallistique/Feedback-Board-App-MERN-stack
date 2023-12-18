@@ -5,9 +5,10 @@ import axios from 'axios';
 import PaperClip from "./icons/PaperClip";
 import Trash from "./icons/Trash";
 import {MoonLoader} from 'react-spinners';
+import Attachment from "./Attachments";
 
 
-export default function FeedbackFormPopup({setShow}){
+export default function FeedbackFormPopup({setShow, onCreate}){
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [uploads, setUploads] = useState([])
@@ -19,11 +20,12 @@ export default function FeedbackFormPopup({setShow}){
     axios.post('/api/feedback', {title, description, uploads})
     .then(()=> {
       setShow(false);
-
+      onCreate();
     })
   }
 
   async function handleAttachFilesInputChange(ev){
+    console.log(ev)
     const files = [...ev.target.files];
     setIsUploading(true)
     const data = new FormData();
@@ -78,26 +80,13 @@ export default function FeedbackFormPopup({setShow}){
                 <div className="flex gap-3">
 
                  { uploads.map(link => (
-                   <a href={link} target="_blank" className="h-16 relative">
-                     <button
-                       onClick={(ev)=> handleReomveFileButtonClick(ev,link) } 
-                       className="-right-2 -top-2 absolute bg-red-300 
-                        p-1 rounded-md text-white">
-                       <Trash />
-                     </button>
-                     {uploads.length > 0 && /.(jpg|png|jpeg)$/.test(link) && (
-                       <img className="h-16 w-auto rounded-md" src={link} alt={link}  />
-                     ) }
-                     {!(/.(jpg|png|jpeg)$/.test(link)) && uploads.length > 0 &&(
-                       <div className="bg-gray-200 h-16 p-6 flex items-center rounded-md text-xs">
-                       <PaperClip className="w-4 h-4"/>
-                       Invalid<br /> Format
-                     </div>
-                     )}
-                     {uploads.length === 0 && (
-                       <div className="p-2">nout</div>
-                     )}
-                   </a>
+                   <Attachment 
+                    uploads={uploads}
+                    link={link}
+                    showRemoveButton={true}
+                    handleReomveFileButtonClick={
+                      (ev, link)=> handleReomveFileButtonClick(ev, link)} 
+                   />
                  ))}
                </div>
               </div>
@@ -113,8 +102,8 @@ export default function FeedbackFormPopup({setShow}){
                 <span className={(isUploading ? 'text-gray-400': 'text-gray-600')}>
                   {isUploading ? 'uploading...' : 'Attach Files'}</span>
                 <input
-                  onChange={handleAttachFilesInputChange} 
                   type="file" 
+                  onChange={(ev)=> {handleAttachFilesInputChange(ev)}} 
                   className="hidden"
                   multiple
                 />

@@ -29,7 +29,7 @@ export default function FeedbackItemPopupComments(){
       placeholder="let us know what you think" />
     
       <div className="flex justify-end gap-2 mt-2">
-        <Button>Attach Filed</Button>
+        <Button>Attach Files</Button>
         <Button primary disabled={commentText===''}>Comment</Button>
       </div>
     </form>
