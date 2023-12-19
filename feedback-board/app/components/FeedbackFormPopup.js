@@ -2,11 +2,9 @@ import Popup from "./Popup"
 import Button from "./Button"
 import { useState } from "react";
 import axios from 'axios';
-import PaperClip from "./icons/PaperClip";
-import Trash from "./icons/Trash";
-import {MoonLoader} from 'react-spinners';
-import Attachment from "./Attachments";
 
+import Attachment from "./Attachments";
+import AttachFilesButton from "./AttachFilesButton";
 
 export default function FeedbackFormPopup({setShow, onCreate}){
   const [title, setTitle] = useState('');
@@ -24,23 +22,6 @@ export default function FeedbackFormPopup({setShow, onCreate}){
     })
   }
 
-  async function handleAttachFilesInputChange(ev){
-    console.log(ev)
-    const files = [...ev.target.files];
-    setIsUploading(true)
-    const data = new FormData();
-    
-    for(const file of files){
-      data.append('file', file)
-    }
-    const res = await axios.post('/api/upload', data);
-
-    setUploads((existingUploads)=> {
-      const responseArray = res.data;
-      return existingUploads.concat(responseArray);
-    });
-    setIsUploading(false)
-  }
 
   function handleReomveFileButtonClick(ev,link){
     ev.preventDefault();
@@ -51,6 +32,9 @@ export default function FeedbackFormPopup({setShow, onCreate}){
     
   }
 
+  function addNewUploads(newLinks){
+    setUploads(prevLinks => [...prevLinks, ...newLinks])
+  }
 
   return(
     <Popup setShow={setShow} title="Make a suggestion" >
@@ -76,8 +60,10 @@ export default function FeedbackFormPopup({setShow, onCreate}){
               <div>
                 <label
                   className="block mt-2 mb-1 text-slate-700"
-                  htmlFor="">Files</label>
-                <div className="flex gap-3">
+                  htmlFor="">
+                    Files
+                </label>
+                <div className="flex gap-3 ">
 
                  { uploads.map(link => (
                    <Attachment 
@@ -92,22 +78,9 @@ export default function FeedbackFormPopup({setShow, onCreate}){
               </div>
                
             )}
-           
-
+          
             <div className="flex gap-2 mt-2 justify-end">
-              <label className={" flex gap-2 py-2 px-4  cursor-pointer"} >
-                {isUploading && (
-                  <MoonLoader size={18}/>
-                )}
-                <span className={(isUploading ? 'text-gray-400': 'text-gray-600')}>
-                  {isUploading ? 'uploading...' : 'Attach Files'}</span>
-                <input
-                  type="file" 
-                  onChange={(ev)=> {handleAttachFilesInputChange(ev)}} 
-                  className="hidden"
-                  multiple
-                />
-              </label>
+              <AttachFilesButton onNewFiles={addNewUploads}  />
               
               <Button primary
                 onClick={handleCreatePostButtonClick}

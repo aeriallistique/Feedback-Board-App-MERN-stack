@@ -13,7 +13,7 @@ export default function Attachment({link, showRemoveButton=false, handleReomveFi
          <Trash />
         </button>
       )}
-      {uploads?.length > 0 && /.(jpg|png|jpeg)$/.test(link) && (
+      { /.(jpg|png|jpeg)$/.test(link) && (
         <img className="h-16 w-auto rounded-md" src={link} alt={link}  />
           ) }
       {!(/.(jpg|png|jpeg)$/.test(link)) && uploads.length > 0 &&(

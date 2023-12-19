@@ -22,7 +22,7 @@ export default function Header(){
             Hello <b>{session.user.name}</b>
           </span>
           <Button 
-            className="shadow-sm border border-gray-400 px-2 py-" 
+            className="border bg-white shadow-sm px-2 py-" 
             onClick={logout}>
               Logout <Logout />
           </Button>
@@ -35,7 +35,7 @@ export default function Header(){
           </span>
           <Button 
             primary
-            className="shadow-sm border px-2 py-" 
+            className="shadow-sm px-2 py-" 
             onClick={login}>
               Login <Login />
           </Button>
