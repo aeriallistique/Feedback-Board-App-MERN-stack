@@ -2,9 +2,10 @@ import { useState } from "react";
 import Attachment from "./Attachments";
 import Button from "./Button";
 import AttachFilesButton from "./AttachFilesButton";
+import axios from "axios";
 
 
-export default function CommentForm(){
+export default function CommentForm({feedbackID}){
   const [commentText, setCommentText]= useState('');
   const [uploads, setUploads]= useState([]);
 
@@ -15,8 +16,16 @@ export default function CommentForm(){
   function removeUpload(ev,linkToRemove ){
     ev.preventDefault();
     ev.stopPropagation();
-
     setUploads(prevLinks=> prevLinks.filter(link=> link !== linkToRemove));
+  }
+
+  function handleCommentButtonClick(ev){
+    ev.preventDefault();
+    axios.post('/api/comment', {
+      text: commentText,
+      uploads:uploads,
+      feedbackID,
+     })
   }
 
   return(
@@ -45,7 +54,13 @@ export default function CommentForm(){
       )}
       <div className="flex justify-end gap-2 mt-2">
         <AttachFilesButton onNewFiles={addUploads}/>
-        <Button primary disabled={commentText===''}>Comment</Button>
+        <Button 
+          primary 
+          disabled={commentText===''}
+          onClick={(ev)=> handleCommentButtonClick(ev)}
+          >
+            Comment
+        </Button>
       </div>
     </form>
   )

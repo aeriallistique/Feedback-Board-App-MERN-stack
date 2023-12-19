@@ -3,7 +3,7 @@ import Button from "./Button";
 import Avatar from "./Avatar";
 import CommentForm from "./CommentForm";
 
-export default function FeedbackItemPopupComments(){
+export default function FeedbackItemPopupComments({feedbackID}){
 
 
   return(
@@ -21,7 +21,7 @@ export default function FeedbackItemPopupComments(){
       </div>
       </div>
     </div>
-      <CommentForm />
+      <CommentForm  feedbackID={feedbackID}/>
     </div>
   )
 }
