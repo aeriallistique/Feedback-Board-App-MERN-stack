@@ -17,3 +17,14 @@ export async function POST(req){
 
   return Response.json(commentDoc);
 }
+
+export async function GET(req){
+  mongoose.connect(process.env.MONGO_URL);
+  const url = new URL(req.url);
+  if(url.searchParams.get('feedbackID')){
+    return Response.json(
+      await Comment.find({feedbackID: url.searchParams.get('feedbackID')})
+    )
+  }
+  return Response.json(false);
+}

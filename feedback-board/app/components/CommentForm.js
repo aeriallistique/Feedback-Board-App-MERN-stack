@@ -5,7 +5,7 @@ import AttachFilesButton from "./AttachFilesButton";
 import axios from "axios";
 
 
-export default function CommentForm({feedbackID}){
+export default function CommentForm({feedbackID, onPost}){
   const [commentText, setCommentText]= useState('');
   const [uploads, setUploads]= useState([]);
 
@@ -19,13 +19,16 @@ export default function CommentForm({feedbackID}){
     setUploads(prevLinks=> prevLinks.filter(link=> link !== linkToRemove));
   }
 
-  function handleCommentButtonClick(ev){
+  async function handleCommentButtonClick(ev){
     ev.preventDefault();
-    axios.post('/api/comment', {
+    await axios.post('/api/comment', {
       text: commentText,
       uploads:uploads,
       feedbackID,
-     })
+     });
+     setCommentText('')
+     setUploads([]);
+     onPost()
   }
 
   return(
