@@ -29,13 +29,13 @@ export default function FeedbackItemPopupComments({feedbackID}){
           {comment.text}
         </p>
         <div className="text-gray-400 mt-3 text-sm">
-          Anonymous &middot; <TimeAgo
+          {comment.user.name} &middot; <TimeAgo
               datetime={comment.createdAt}
               locale='en_US'
 />
         </div>
         {comment.uploads?.length >0 && (
-         <div className="flex gap-2 mt-2">
+         <div className="flex gap-2 mt-3">
            {comment.uploads.map((link)=>(
              <Attachment link={link}/>
            ))}
