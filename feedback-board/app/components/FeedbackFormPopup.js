@@ -5,21 +5,26 @@ import axios from 'axios';
 
 import Attachment from "./Attachments";
 import AttachFilesButton from "./AttachFilesButton";
+import { useSession } from "next-auth/react";
 
 export default function FeedbackFormPopup({setShow, onCreate}){
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [uploads, setUploads] = useState([])
   const [isUploading, setIsUploading] = useState(false);
+  const {data: session} = useSession();
 
   function handleCreatePostButtonClick(ev){
     ev.preventDefault();
-
-    axios.post('/api/feedback', {title, description, uploads})
-    .then(()=> {
-      setShow(false);
-      onCreate();
-    })
+    if(session){
+      axios.post('/api/feedback', {title, description, uploads})
+          .then(()=> {
+            setShow(false);
+            onCreate();
+          })
+    }else{
+      localStorage.setItem('post_after_login', JSON.stringify({title, description, uploads}))
+    } 
   }
 
 
@@ -83,9 +88,8 @@ export default function FeedbackFormPopup({setShow, onCreate}){
               <AttachFilesButton onNewFiles={addNewUploads}  />
               
               <Button primary
-                onClick={handleCreatePostButtonClick}
-              >
-                Create Post
+                onClick={handleCreatePostButtonClick}>
+                  {session ? '' : 'Login to post'}
               </Button>
             </div>
           

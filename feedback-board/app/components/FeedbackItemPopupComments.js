@@ -23,7 +23,7 @@ export default function FeedbackItemPopupComments({feedbackID}){
      {comments?.length > 0 && comments.map((comment) =>(
        <div className=" mb-8">
          <div className="flex gap-4">
-          <Avatar />
+          <Avatar url={comment.user.image}/>
         <div>
         <p className="text-gray-600">
           {comment.text}
