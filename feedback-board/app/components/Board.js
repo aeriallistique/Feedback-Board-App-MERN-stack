@@ -25,15 +25,33 @@ export default function Board(){
 
   useEffect(()=>{
     if(session?.user?.email){
-      const feedbackID = localStorage.getItem('vote_after_login');
-      if(feedbackID){
-        
+      const feedbackToVote = localStorage.getItem('vote_after_login');
+      if(feedbackToVote){
         // axio to api to save the vote
-        axios.post('/api/vote', {feedbackID}).then(()=>{
+        axios.post('/api/vote', {feedbackID: feedbackToVote}).then(()=>{
           // remove id from local storage
           localStorage.removeItem('vote_after_login');
           fetchVotes();
         }) 
+      }
+      const feedbackToPost = localStorage.getItem('post_after_login');
+      if(feedbackToPost){
+        const feedbackData = JSON.parse(feedbackToPost);
+        axios.post('/api/feedback', feedbackData).then( async(res)=>{
+          await fetchFeedbacks();
+          setShowFeedbackPopupItem(res.data);
+          localStorage.removeItem('post_after_login');
+        })
+      }
+      const commentToPost = localStorage.getItem('comment_after_login')
+      if(commentToPost){
+        const commentData = JSON.parse(commentToPost)
+        axios.post('api/comment', commentData).then(()=>{
+          axios.get('api/feedback?id='+commentData.feedbackID).then(res =>{
+            setShowFeedbackPopupItem(res.data);
+            localStorage.removeItem('comment_after_login');
+          })
+        })
       }
     }
   },[session?.user?.email])
@@ -64,7 +82,7 @@ export default function Board(){
   return(
     <main className="bg-white max-w-2xl md:mx-auto 
           md:shadow-lg md:rounded-lg md:mt-8 overflow-hidden">
-            
+
         <div className="bg-gradient-to-r from-cyan-400 to-blue-400 p-8">
           <h1 className="font-bold text-xl">
             Coding with Andrei

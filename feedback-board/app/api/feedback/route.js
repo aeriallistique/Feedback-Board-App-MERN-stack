@@ -13,11 +13,19 @@ export async function POST(request){
   const session = await getServerSession(authOptions); 
   const userEmail = session.user.email;
 
-  await Feedback.create({title, description, uploads, userEmail})
-  return Response.json(jsonBody)
+  const feedbackDoc = await Feedback.create({title, description, uploads, userEmail})
+  return Response.json(feedbackDoc)
 }
 
-export async function GET(){
+export async function GET(req){
   await mongoose.connect(mongoURL);
+  const url = new URL(req.url);
+  if(url.searchParams.get('id')){
+    return Response.json(
+      await Feedback.findById(url.searchParams.get('id'))
+    )
+  }else{
   return Response.json(await Feedback.find());
+  }
+  
 }

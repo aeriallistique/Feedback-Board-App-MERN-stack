@@ -7,7 +7,9 @@ export async function POST(req){
   mongoose.connect(process.env.MONGO_URL);
   const jsonBody = await req.json();
   const session = await getServerSession(authOptions);
-
+  if(!session){
+    return Response.json(false);
+  }
   const commentDoc = await Comment.create({
     text: jsonBody.text,
     uploads: jsonBody.uploads,

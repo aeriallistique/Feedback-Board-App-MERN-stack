@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import Attachment from "./Attachments";
 import AttachFilesButton from "./AttachFilesButton";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 export default function FeedbackFormPopup({setShow, onCreate}){
   const [title, setTitle] = useState('');
@@ -14,7 +14,7 @@ export default function FeedbackFormPopup({setShow, onCreate}){
   const [isUploading, setIsUploading] = useState(false);
   const {data: session} = useSession();
 
-  function handleCreatePostButtonClick(ev){
+  async function handleCreatePostButtonClick(ev){
     ev.preventDefault();
     if(session){
       axios.post('/api/feedback', {title, description, uploads})
@@ -23,7 +23,11 @@ export default function FeedbackFormPopup({setShow, onCreate}){
             onCreate();
           })
     }else{
-      localStorage.setItem('post_after_login', JSON.stringify({title, description, uploads}))
+      localStorage.setItem('post_after_login', 
+          JSON.stringify({
+            title, description, uploads
+          }));
+      await signIn('google');
     } 
   }
 
@@ -89,7 +93,7 @@ export default function FeedbackFormPopup({setShow, onCreate}){
               
               <Button primary
                 onClick={handleCreatePostButtonClick}>
-                  {session ? '' : 'Login to post'}
+                  {session ? 'POST' : 'Login to post'}
               </Button>
             </div>
           
