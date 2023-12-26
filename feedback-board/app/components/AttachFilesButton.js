@@ -1,6 +1,7 @@
 import { MoonLoader } from "react-spinners"
 import { useState } from "react";
 import axios from "axios";
+import UploadIcon from "./icons/UploadIcon";
 
 export default function AttachFilesButton({onNewFiles}){
   const [isUploading, setIsUploading]= useState(false);
@@ -22,10 +23,12 @@ export default function AttachFilesButton({onNewFiles}){
   
 
   return(
-    <label className={" flex gap-2 py-2 px-4  cursor-pointer"} >
+    <label className={" flex gap-2 py-2 px-4  cursor-pointer items-center"} >
                 {isUploading && (
                   <MoonLoader size={18}/>
                 )}
+                {!isUploading && (<UploadIcon  className="w-4 h-4"/>)}
+                
                 <span className={(isUploading ? 'text-gray-400': 'text-gray-600')}>
                   {isUploading ? 'uploading...' : 'Attach Files'}</span>
                 <input

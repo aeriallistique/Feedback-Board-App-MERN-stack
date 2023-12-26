@@ -78,6 +78,13 @@ export default function Board(){
     setShowFeedbackPopupItem(feedback)
   }
 
+  async function handleFeedbackUpdate(newData){
+    setShowFeedbackPopupItem(prevData => {
+      return {...prevData, ...newData};
+    });
+    await fetchFeedbacks();
+  }
+
 
   return(
     <main className="bg-white max-w-2xl md:mx-auto 
@@ -122,7 +129,9 @@ export default function Board(){
             {...showFeebackPopupItem}
             votes={votes.filter(v=> v.feedbackID.toString()=== showFeebackPopupItem._id)} 
             onVotesChange={fetchVotes}
-            setShow={setShowFeedbackPopupItem} />
+            setShow={setShowFeedbackPopupItem} 
+            onUpdate={handleFeedbackUpdate}
+            />
         )}
 
       </main>

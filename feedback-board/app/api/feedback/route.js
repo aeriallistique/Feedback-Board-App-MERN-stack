@@ -25,7 +25,21 @@ export async function GET(req){
       await Feedback.findById(url.searchParams.get('id'))
     )
   }else{
-  return Response.json(await Feedback.find());
+    return Response.json(await Feedback.find().populate('user'));
   }
   
+}
+
+export async function PUT(){
+  const jsonBody = await request.json();
+  const {title, description, uploads, id} = jsonBody;
+  await mongoose.connect(mongoURL);
+  const session = await getServerSession(authOptions); 
+  if(!session){
+    return Response.json(false);
+  }
+  const newFeedbackDoc = await Feedback.updateOne({_id: id, userEmail: session.user.email}, 
+    {title, description, uploads})
+
+  return Response.json(newFeedbackDoc);
 }
