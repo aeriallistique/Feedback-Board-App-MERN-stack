@@ -16,7 +16,7 @@ export default function Attachment({link, showRemoveButton=false, handleReomveFi
       { /.(jpg|png|jpeg)$/.test(link) && (
         <img className="h-16 w-auto rounded-md" src={link} alt={link}  />
           ) }
-      {!(/.(jpg|png|jpeg)$/.test(link)) && uploads.length > 0 &&(
+      {!(/.(jpg|png|jpeg)$/.test(link)) && uploads?.length > 0 &&(
         <div className="bg-gray-200 h-16 p-6 flex items-center rounded-md text-xs">
           <PaperClip className="w-4 h-4"/>
             Invalid<br /> Format

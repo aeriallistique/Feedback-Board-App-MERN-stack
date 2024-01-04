@@ -28,14 +28,21 @@ export async function GET(req){
       .find({feedbackID: url.searchParams.get('feedbackID')})
       .populate('user')
 
-    return Response.json(
-      result.map(doc=> {
-        const {userEmail, ...commentWithoutEmail} = doc.toJSON();
-        const{email, ...userWithoutEmail} = commentWithoutEmail.user;
-        commentWithoutEmail.user = userWithoutEmail;
-        return commentWithoutEmail;
-      })
-      )
+    return Response.json(result)
   }
   return Response.json(false);
+}
+
+export async function PUT(req){
+  mongoose.connect(process.env.MONGO_URL);
+  const jsonBody = await req.json();
+  const session = await getServerSession(authOptions);
+  if(!session){
+    return Response.json(false);
+  }
+  const {id,text, uploads} = jsonBody;
+  const updatedCommentDoc = await Comment.findOneAndUpdate(
+    {userEmail: session.user.email, _id: id},{text, uploads})
+
+  return Response.json(updatedCommentDoc);
 }
