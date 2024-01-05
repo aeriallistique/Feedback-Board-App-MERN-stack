@@ -71,7 +71,7 @@ export default function CommentForm({feedbackID, onPost}){
           onClick={(ev)=> handleCommentButtonClick(ev)}
           >
             {session ? 'Comment' : 'Login and Comment'}
-            Comment
+            
         </Button>
       </div>
     </form>

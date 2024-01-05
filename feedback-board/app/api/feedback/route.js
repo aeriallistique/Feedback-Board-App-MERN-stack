@@ -20,12 +20,25 @@ export async function POST(request){
 export async function GET(req){
   await mongoose.connect(mongoURL);
   const url = new URL(req.url);
+
   if(url.searchParams.get('id')){
     return Response.json(
       await Feedback.findById(url.searchParams.get('id'))
-    )
-  }else{
-    return Response.json(await Feedback.find().populate('user'));
+      )
+    }else{
+      const sortParam = url.searchParams.get('sort');
+    let sortDef;
+    if(sortParam === 'latest'){
+      sortDef = {createdAt: -1}
+    }
+    if(sortParam === 'oldest'){
+      sortDef = {createdAt:1}
+    }
+    if(sortParam === 'votes'){
+      sortDef= {createdAt: 1}
+    }
+
+    return Response.json(await Feedback.find(null, null, {sort:sortDef}).populate('user'));
   }
   
 }
