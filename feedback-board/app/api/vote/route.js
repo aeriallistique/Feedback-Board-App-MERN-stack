@@ -21,16 +21,14 @@ export async function POST(request){
 
   // find existing vote
   const existingVote = await Vote.findOne({feedbackID, userEmail})
-  await reCountVotes(feedbackID)
   if(existingVote){
     // if there's a vote, then remove it
     await Vote.findByIdAndDelete(existingVote._id);
-   
-
+    await reCountVotes(feedbackID)
     return Response.json(existingVote);
   }else{
     const voteDocument = await Vote.create({feedbackID, userEmail});
-    
+    await reCountVotes(feedbackID)
     return Response.json(voteDocument)
   }
 }

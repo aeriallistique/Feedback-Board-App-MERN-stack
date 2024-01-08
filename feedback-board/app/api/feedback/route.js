@@ -35,7 +35,7 @@ export async function GET(req){
       sortDef = {createdAt:1}
     }
     if(sortParam === 'votes'){
-      sortDef= {createdAt: 1}
+      sortDef= {votesCountCashed: -1}
     }
 
     return Response.json(await Feedback.find(null, null, {sort:sortDef}).populate('user'));
