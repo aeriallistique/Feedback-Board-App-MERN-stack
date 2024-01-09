@@ -13,6 +13,7 @@ export default function Board(){
   const [votes, setVotes] = useState([])
   const [votesLoadin, setVotesLoading] = useState(false);
   const [sort, setSort] = useState('votes')
+  const [lastId, setLastId] = useState('')
   const {data:session} = useSession();
 
 
@@ -62,9 +63,32 @@ export default function Board(){
     }
   },[session?.user?.email])
 
+  function handleScroll(){
+    const html = window.document.querySelector('html');
+    const howMuchScrolled = html.scrollTop;
+    const howMuchIsToScroll = html.scrollHeight;
+    const leftToScroll = howMuchIsToScroll - howMuchScrolled -html.clientHeight;
+    console.log(leftToScroll)
+  }
+
+  function unregisterScrollListener(){
+    window.addEventListener('scroll', handleScroll)
+  }
+
+  function registerScrollListener(){
+    window.addEventListener('scroll', handleScroll)
+  }
+
+
+  useEffect(()=>{
+    registerScrollListener();
+    return ()=> {unregisterScrollListener()}
+  },[]);
+
   async function fetchFeedbacks(){
-    axios.get('/api/feedback?sort='+sort).then(res => {
+    axios.get(`/api/feedback?sort=${sort}&lastId=${lastId}`).then(res => {
       setFeedbacks(res.data)
+      setLastId(res.data[res.data.length -1]._id)
     })
   }
 
