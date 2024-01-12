@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import FeedbackFormPopup from "./FeedbackFormPopup";
 import FeedbackItem from "./FeedbackItem";
 import Button from "./Button";
 import FeedbackItemPopup from "./FeedbackItemPopup";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import { MoonLoader } from "react-spinners";
+import Search from "./icons/Search";
 
 export default function Board(){
   const [showFeebackPopupForm, setShowFeedbackPopupForm] = useState(false)
@@ -12,8 +14,12 @@ export default function Board(){
   const [feedbacks, setFeedbacks] = useState([])
   const [votes, setVotes] = useState([])
   const [votesLoadin, setVotesLoading] = useState(false);
+  const fetchingFeedbacksRef = useRef(false);
+  const [fetchingFeedbacks, setFetchingFeedbacks] = useState(false);
   const [sort, setSort] = useState('votes')
-  const [lastId, setLastId] = useState('')
+  const sortRef = useRef('votes');
+  const loadedRows = useRef(0)
+  const everythingLoadedRef = useRef(false);
   const {data:session} = useSession();
 
 
@@ -27,8 +33,13 @@ export default function Board(){
   },[feedbacks])
 
   useEffect(()=>{
+    loadedRows.current =0;
+    sortRef.current = sort;
+    everythingLoadedRef.current = false;
     fetchFeedbacks()
   },[sort])
+
+  
 
   useEffect(()=>{
     if(session?.user?.email){
@@ -63,16 +74,19 @@ export default function Board(){
     }
   },[session?.user?.email])
 
-  function handleScroll(){
+  function handleScroll(append){
     const html = window.document.querySelector('html');
     const howMuchScrolled = html.scrollTop;
     const howMuchIsToScroll = html.scrollHeight;
-    const leftToScroll = howMuchIsToScroll - howMuchScrolled -html.clientHeight;
-    console.log(leftToScroll)
+    const leftToScroll = howMuchIsToScroll - howMuchScrolled - html.clientHeight;
+    if(leftToScroll <+ 100){
+      fetchFeedbacks(append=true)
+    }
   }
 
   function unregisterScrollListener(){
     window.addEventListener('scroll', handleScroll)
+
   }
 
   function registerScrollListener(){
@@ -85,11 +99,28 @@ export default function Board(){
     return ()=> {unregisterScrollListener()}
   },[]);
 
-  async function fetchFeedbacks(){
-    axios.get(`/api/feedback?sort=${sort}&lastId=${lastId}`).then(res => {
-      setFeedbacks(res.data)
-      setLastId(res.data[res.data.length -1]._id)
-    })
+  async function fetchFeedbacks(append=false){
+    if(fetchingFeedbacksRef.current) return;
+    if(everythingLoadedRef.current) return;
+    fetchingFeedbacksRef.current= true;
+    setFetchingFeedbacks(true);
+    axios.get(`/api/feedback?sort=${sortRef.current}&loadedRows=${loadedRows.current}`).then(res => {
+      if(append){
+        setFeedbacks(currentFeedbacks => [...currentFeedbacks, ...res.data])
+      }else{
+        setFeedbacks(res.data)
+      }
+      if(res.data.length > 0){
+        loadedRows.current += res.data.length;
+      }
+
+      if(res.data?.length === 0){
+        everythingLoadedRef.current = true;      
+      }
+
+      fetchingFeedbacksRef.current= false;
+      setFetchingFeedbacks(false);
+      })
   }
 
   async function fetchVotes(){
@@ -118,7 +149,7 @@ export default function Board(){
 
   return(
     <main className="bg-white max-w-2xl md:mx-auto 
-          md:shadow-lg md:rounded-lg md:mt-8 overflow-hidden">
+          md:shadow-lg md:rounded-lg md:mt-4 md:mb-8 overflow-hidden">
 
         <div className="bg-gradient-to-r from-cyan-400 to-blue-400 p-8">
           <h1 className="font-bold text-xl">
@@ -129,16 +160,23 @@ export default function Board(){
           </p>
         </div>
         <div className="bg-gray-100 px-8 py-4 flex border-b">
-          <div className="grow flex items-center">
-            <span className="text-gray-400 text-sm mr-2">Sort by:</span>
+          <div className="grow flex items-center gap-4 text-gray-500">
             <select
               value={sort}
-              onChange={ev => setSort(ev.target.value)} 
-              className="bg-transparent py-2 text-gray-600">
+              onChange={ev =>{ setSort(ev.target.value);}} 
+              className="bg-transparent py-2 ">
                 <option value="votes">Most Voted</option>
                 <option value="latest">Latest</option>
                 <option value="oldest">Oldest</option>
             </select>
+            <div className="relative">
+              <Search className="w-4 h-4 absolute top-3" />
+              <input 
+                type="text" 
+                placeholder="Search" 
+                className="bg-transparent p-2 pl-5"
+              />
+            </div>
           </div>
           <div>
             
@@ -157,8 +195,11 @@ export default function Board(){
                           parentLoadingVotes={votesLoadin} 
                           onOpen={()=> openFeedbackPopupItem(feedback)}/> 
           ))}
-          
-          
+        {fetchingFeedbacks && (
+          <div className="p-4">
+            <MoonLoader size={24}/>
+          </div>
+        )}  
         </div> 
         {showFeebackPopupForm && (
           <FeedbackFormPopup 

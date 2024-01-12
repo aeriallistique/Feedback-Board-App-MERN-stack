@@ -27,7 +27,7 @@ export async function GET(req){
       )
     }else{
       const sortParam = url.searchParams.get('sort');
-      const lastId = url.searchParams.get('lastId');
+      const loadedRows = url.searchParams.get('loadedRows');
     let sortDef;
     if(sortParam === 'latest'){
       sortDef = {createdAt: -1}
@@ -39,10 +39,10 @@ export async function GET(req){
       sortDef= {votesCountCashed: -1} 
     }
 
-    const filter = lastId ? {_id:{$gt:lastId}}: null;
 
-    return Response.json(await Feedback.find(filter, null, {
+    return Response.json(await Feedback.find(null, null, {
       sort:sortDef,
+      skip:loadedRows,
       limit: 10,
     }).populate('user'));
   }
