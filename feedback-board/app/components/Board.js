@@ -7,6 +7,8 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import { MoonLoader } from "react-spinners";
 import Search from "./icons/Search";
+import { debounce } from "lodash";
+
 
 export default function Board(){
   const [showFeebackPopupForm, setShowFeedbackPopupForm] = useState(false)
@@ -16,12 +18,16 @@ export default function Board(){
   const [votesLoadin, setVotesLoading] = useState(false);
   const fetchingFeedbacksRef = useRef(false);
   const [fetchingFeedbacks, setFetchingFeedbacks] = useState(false);
+  const waitingRef = useRef(false);
+  const [waiting, setWaiting] = useState(false);
   const [sort, setSort] = useState('votes')
   const sortRef = useRef('votes');
   const loadedRows = useRef(0)
   const everythingLoadedRef = useRef(false);
   const {data:session} = useSession();
-
+  const [searchPhrase, setSearchPhrase] = useState('')
+  const searchPhraseRef = useRef('');
+  const debouncedFetchFeedbacksRef = useRef(debounce(fetchFeedbacks, 500))
 
   useEffect(()=>{
     fetchFeedbacks()
@@ -35,9 +41,15 @@ export default function Board(){
   useEffect(()=>{
     loadedRows.current =0;
     sortRef.current = sort;
+    searchPhraseRef.current = searchPhrase;
     everythingLoadedRef.current = false;
-    fetchFeedbacks()
-  },[sort])
+    if(feedbacks?.length > 0 ){
+      setFeedbacks([])
+    }
+    setWaiting(true);
+    waitingRef.current = true;
+    debouncedFetchFeedbacksRef.current();
+  },[sort, searchPhrase])
 
   
 
@@ -99,12 +111,16 @@ export default function Board(){
     return ()=> {unregisterScrollListener()}
   },[]);
 
+
+
+
   async function fetchFeedbacks(append=false){
     if(fetchingFeedbacksRef.current) return;
     if(everythingLoadedRef.current) return;
     fetchingFeedbacksRef.current= true;
     setFetchingFeedbacks(true);
-    axios.get(`/api/feedback?sort=${sortRef.current}&loadedRows=${loadedRows.current}`).then(res => {
+    axios.get(`/api/feedback?sort=${sortRef.current}&loadedRows=${loadedRows
+      .current}&search=${searchPhraseRef.current}`).then(res => {
       if(append){
         setFeedbacks(currentFeedbacks => [...currentFeedbacks, ...res.data])
       }else{
@@ -120,6 +136,8 @@ export default function Board(){
 
       fetchingFeedbacksRef.current= false;
       setFetchingFeedbacks(false);
+      waitingRef.current = false;
+      setWaiting(false)
       })
   }
 
@@ -159,7 +177,7 @@ export default function Board(){
             Help me decide what should I build net or how can I improve.
           </p>
         </div>
-        <div className="bg-gray-100 px-8 py-4 flex border-b">
+        <div className="bg-gray-100 px-8 py-4 flex items-center border-b">
           <div className="grow flex items-center gap-4 text-gray-500">
             <select
               value={sort}
@@ -170,11 +188,13 @@ export default function Board(){
                 <option value="oldest">Oldest</option>
             </select>
             <div className="relative">
-              <Search className="w-4 h-4 absolute top-3" />
+              <Search className="w-4 h-4 absolute top-3 left-2 pointer-events-none" />
               <input 
+                value={searchPhrase}
+                onChange={ev => setSearchPhrase(ev.target.value)}
                 type="text" 
                 placeholder="Search" 
-                className="bg-transparent p-2 pl-5"
+                className="bg-transparent p-2 pl-7"
               />
             </div>
           </div>
@@ -195,7 +215,7 @@ export default function Board(){
                           parentLoadingVotes={votesLoadin} 
                           onOpen={()=> openFeedbackPopupItem(feedback)}/> 
           ))}
-        {fetchingFeedbacks && (
+        {(fetchingFeedbacks || waiting) && (
           <div className="p-4">
             <MoonLoader size={24}/>
           </div>
