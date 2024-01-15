@@ -63,7 +63,7 @@ export default function FeedbackFormPopup({setShow, onCreate}){
           <textarea
             value={description}
             onChange={(ev)=> setDescription(ev.target.value)}
-            className="w-full border p-2 rounded-md" 
+            className="w-full border p-2 rounded-md h-24" 
             placeholder="please include any details" />
             {uploads?.length > 0 && (
               <div>
